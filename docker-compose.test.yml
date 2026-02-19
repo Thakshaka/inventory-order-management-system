@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: inventory_user
+      POSTGRES_PASSWORD: inventory_pass
+      POSTGRES_DB: inventory_db
+    command: >
+      postgres -c "shared_buffers=128MB"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inventory_user -d inventory_db"]
+      interval: 3s
+      timeout: 5s
+      retries: 15
+      start_period: 5s
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: test
+      LOG_LEVEL: WARNING
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: inventory_user
+      POSTGRES_PASSWORD: inventory_pass
+      POSTGRES_DB: inventory_db
+      ASYNC_DATABASE_URL: postgresql+asyncpg://inventory_user:inventory_pass@db:5432/inventory_db
+      DATABASE_URL: postgresql://inventory_user:inventory_pass@db:5432/inventory_db
+      TEST_ASYNC_DATABASE_URL: postgresql+asyncpg://inventory_user:inventory_pass@db:5432/test_inventory_db
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        PGPASSWORD=inventory_pass psql -h db -U inventory_user -d inventory_db -c "CREATE DATABASE test_inventory_db" 2>/dev/null || true
+        exec python -m pytest tests/ -v --tb=short
+    restart: "no"
