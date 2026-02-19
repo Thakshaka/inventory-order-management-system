@@ -113,6 +113,14 @@ def create_app() -> FastAPI:
             content={"detail": exc.errors()},
         )
 
+    @app.get("/", tags=["Root"], include_in_schema=False)
+    async def root() -> dict[str, str]:
+        return {
+            "message": "Welcome to the Inventory & Order Management API",
+            "docs": "/docs",
+            "version": settings.app_version,
+        }
+
     @app.get("/health", tags=["Health"], include_in_schema=False)
     async def health_check() -> dict[str, str]:
         return {"status": "ok", "version": settings.app_version}
