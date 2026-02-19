@@ -1,6 +1,9 @@
 # Inventory & Order Management System
 
+<img src="dashboard.jpg" alt="Dashboard" width="100%" style="aspect-ratio: 16 / 9; object-fit: cover;">
+
 FastAPI · SQLAlchemy 2.0 (async) · PostgreSQL · Alembic · Docker
+
 
 ---
 
