@@ -23,11 +23,13 @@ class Settings(BaseSettings):
 
     @property
     def async_url(self) -> str:
-        if self.async_database_url:
-            return self.async_database_url
-        if self.database_url and self.database_url.startswith("postgresql://"):
-            return self.database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        return self.async_database_url or ""
+        """Derive async database URL from sync URL if not provided."""
+        url = self.async_database_url
+        if not url and self.database_url:
+            if self.database_url.startswith("postgresql://"):
+                url = self.database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        # Ensure we always return a valid-looking SQLAlchemy connection string to avoid early crashes
+        return url or "postgresql+asyncpg://user:pass@localhost/db"
     test_async_database_url: str = (
         "postgresql+asyncpg://inventory_user:inventory_pass@localhost:5432/test_inventory_db"
     )

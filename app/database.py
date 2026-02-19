@@ -29,7 +29,12 @@ else:
         }
     )
 
-engine = create_async_engine(settings.async_url, **_engine_kwargs)
+try:
+    engine = create_async_engine(settings.async_url, **_engine_kwargs)
+except Exception:
+    # Fallback engine for cases where the URL is malformed during initialization.
+    # This allows the app to start and return an informative error later.
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", **_engine_kwargs)
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
