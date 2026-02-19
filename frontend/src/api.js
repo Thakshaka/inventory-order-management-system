@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: 'https://inventory-order-management-system-backend.vercel.app/api/v1',
 });
 
 export const getProducts = async () => {
