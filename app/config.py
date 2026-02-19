@@ -16,12 +16,13 @@ class Settings(BaseSettings):
     app_title: str = "Inventory & Order Management API"
     app_version: str = "1.0.0"
 
-    # Alembic uses the sync DSN; the app uses the async DSN.
-    async_database_url: str = (
-        "postgresql+asyncpg://inventory_user:inventory_pass@localhost:5432/inventory_db"
-    )
+    # Supabase/Vercel typically provides DATABASE_URL.
+    # We use that for sync operations and derive/use async for the app.
     database_url: str = (
         "postgresql://inventory_user:inventory_pass@localhost:5432/inventory_db"
+    )
+    async_database_url: str = (
+        "postgresql+asyncpg://inventory_user:inventory_pass@localhost:5432/inventory_db"
     )
     test_async_database_url: str = (
         "postgresql+asyncpg://inventory_user:inventory_pass@localhost:5432/test_inventory_db"
