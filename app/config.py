@@ -16,14 +16,18 @@ class Settings(BaseSettings):
     app_title: str = "Inventory & Order Management API"
     app_version: str = "1.0.0"
 
-    # Supabase/Vercel typically provides DATABASE_URL.
-    # We use that for sync operations and derive/use async for the app.
     database_url: str = (
         "postgresql://inventory_user:inventory_pass@localhost:5432/inventory_db"
     )
-    async_database_url: str = (
-        "postgresql+asyncpg://inventory_user:inventory_pass@localhost:5432/inventory_db"
-    )
+    async_database_url: str | None = None
+
+    @property
+    def async_url(self) -> str:
+        if self.async_database_url:
+            return self.async_database_url
+        if self.database_url and self.database_url.startswith("postgresql://"):
+            return self.database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return self.async_database_url or ""
     test_async_database_url: str = (
         "postgresql+asyncpg://inventory_user:inventory_pass@localhost:5432/test_inventory_db"
     )
